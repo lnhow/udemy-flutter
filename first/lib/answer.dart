@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Answer extends StatelessWidget {
-  final String text;
-  final VoidCallback onSelect;
+  final Map<String, Object> answer;
+  final void Function(Map<String, Object>) onSelect;
 
-  const Answer({required this.text, required this.onSelect, super.key});
+  const Answer({required this.answer, required this.onSelect, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +12,10 @@ class Answer extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.all(5),
         child: ElevatedButton(
-          onPressed: onSelect,
+          onPressed: () => onSelect(answer),
           style:
               ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-          child: Text(text),
+          child: Text(answer['text'] as String),
         ));
   }
 }

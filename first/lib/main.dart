@@ -1,40 +1,69 @@
 import 'package:flutter/material.dart';
 
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class _MyAppState extends State<MyApp> {
-  var _currentQuestion = 0;
+  int _currentQuestion = 0;
+  int _totalScore = 0;
   static const _questions = [
     {
       'question': 'Select A',
-      'answers': ['A', 'B', 'C', 'D'],
+      'answers': [
+        { 'text': 'A', 'score': 10 },
+        { 'text': 'B', 'score': 5 },
+        { 'text': 'C', 'score': 3 },
+        { 'text': 'D', 'score': 1 },
+      ],
       'correctAnswer': 0
     },
     {
       'question': 'Select B',
-      'answers': ['A', 'B', 'C', 'D'],
+      'answers': [
+        { 'text': 'A', 'score': 5 },
+        { 'text': 'B', 'score': 10 },
+        { 'text': 'C', 'score': 5 },
+        { 'text': 'D', 'score': 3 },
+      ],
       'correctAnswer': 1
     },
     {
       'question': 'Select C',
-      'answers': ['A', 'B', 'C', 'D'],
+      'answers': [
+        { 'text': 'A', 'score': 3 },
+        { 'text': 'B', 'score': 5 },
+        { 'text': 'C', 'score': 10 },
+        { 'text': 'D', 'score': 5 },
+      ],
       'correctAnswer': 2
     },
     {
       'question': 'Select D',
-      'answers': ['A', 'B', 'C', 'D'],
+      'answers': [
+        { 'text': 'A', 'score': 1 },
+        { 'text': 'B', 'score': 3 },
+        { 'text': 'C', 'score': 5 },
+        { 'text': 'D', 'score': 10 },
+      ],
       'correctAnswer': 3
     },
   ];
 
-  void handleAnswer() {
+  void handleAnswer(Map<String, Object> answer) {
     setState(() {
       _currentQuestion += 1;
+      _totalScore += answer['score'] as int;
+    });
+  }
+
+  void handleReset() {
+    setState(() {
+      _currentQuestion = 0;
+      _totalScore = 0;
     });
   }
 
@@ -43,20 +72,19 @@ class _MyAppState extends State<MyApp> {
     final isNotAllAnswered = _currentQuestion < _questions.length;
     
     return MaterialApp(
-      title: 'Text',
+      title: 'Attentspan',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(title: const Text('App Bar Title')),
+        appBar: AppBar(title: const Text('Attentspan')),
         body: isNotAllAnswered
-            ? Column(children: [
-                Question(question: _questions[_currentQuestion]['question'] as String),
-                ...(_questions[_currentQuestion]['answers'] as List<String>).map((e) {
-                  return Answer(onSelect: handleAnswer, text: e);
-                })
-              ])
-            : const Center(child: Text('All answered')),
+            ? Quiz(
+                questions: _questions,
+                currentQuestion: _currentQuestion,
+                handleAnswer: handleAnswer,
+              )
+            : QuizResult(finalScore: _totalScore, handleReset: handleReset),
       ),
     );
   }
