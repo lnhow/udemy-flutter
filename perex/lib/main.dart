@@ -14,28 +14,26 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'perex',
       theme: ThemeData(
-        primaryColor: Colors.deepPurple,
-        errorColor: Colors.red,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.purple,
-          accentColor:  Colors.deepPurpleAccent,
-        ),
-        fontFamily: 'Quicksand',
-        appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(
-              fontFamily: 'OpenSans',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )
-        ),
-        textTheme: ThemeData.light().textTheme.copyWith(
-          headline6: const TextStyle(
-            fontFamily: 'OpenSans',
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          primaryColor: Colors.deepPurple,
+          errorColor: Colors.red,
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepPurpleAccent,
           ),
-        )
-      ),
+          fontFamily: 'Quicksand',
+          appBarTheme: const AppBarTheme(
+              titleTextStyle: TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          )),
+          textTheme: ThemeData.light().textTheme.copyWith(
+                headline6: const TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
       home: const MyHomePage(),
     );
   }
@@ -48,12 +46,13 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('perex'),
-      ),
-      body: const TransactionPage()
-      // floatingActionButton: ,
+    final appBar = AppBar(
+      title: const Text('perex'),
     );
+    return Scaffold(
+        appBar: appBar,
+        body: TransactionPage(
+            height: MediaQuery.of(context).size.height -
+                appBar.preferredSize.height - MediaQuery.of(context).padding.top));
   }
 }

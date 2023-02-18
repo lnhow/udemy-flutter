@@ -6,7 +6,9 @@ import 'package:perex/widgets/chart.dart';
 import 'package:perex/model/transaction.dart';
 
 class TransactionPage extends StatefulWidget {
-  const TransactionPage({super.key});
+  final double height;
+
+  const TransactionPage({super.key, required this.height});
 
   @override
   State<TransactionPage> createState() => _TransactionPageState();
@@ -55,16 +57,22 @@ class _TransactionPageState extends State<TransactionPage> {
     return Scaffold(
       body: Column(
         children: [
-          Chart(
-            transactions: _recentTransactions,
+          SizedBox(
+            height: widget.height * 0.2,
+            child: Chart(
+              transactions: _recentTransactions,
+            ),
+          ),
+          SizedBox(
+            height: widget.height * 0.8,
+            child: TransactionListWidget(
+              transactions: _transactions,
+              onDelete: _deleteTransaction,
+            ),
           ),
           // TransactionInput(
           //   onSubmit: _addTransaction,
           // ),
-          TransactionListWidget(
-            transactions: _transactions,
-            onDelete: _deleteTransaction,
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
