@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:perex/widgets/transaction.dart';
-
-import 'widgets/chart.dart';
-import 'model/transaction.dart';
+import 'package:perex/widgets/transaction_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +14,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'perex',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Colors.deepPurple,
+        errorColor: Colors.red,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.purple,
+          accentColor:  Colors.deepPurpleAccent,
+        ),
+        fontFamily: 'Quicksand',
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(
+              fontFamily: 'OpenSans',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            )
+        ),
+        textTheme: ThemeData.light().textTheme.copyWith(
+          headline6: const TextStyle(
+            fontFamily: 'OpenSans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        )
       ),
       home: const MyHomePage(),
     );
@@ -25,10 +42,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  static final List<Transaction> transactions = [
-    Transaction(id: '1', title: 'Banh mi', amount: 50, date: DateTime.now()),
-    Transaction(id: '2', title: 'Banh bao', amount: 100, date: DateTime.now()),
-  ];
   const MyHomePage({
     super.key,
   });
@@ -39,14 +52,8 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('perex'),
       ),
-      body: Column(
-        children: <Widget>[
-          const Chart(),
-          Column(children: transactions.map((tx) {
-            return TransactionWidget(tx: tx);
-          }).toList(),)
-        ],
-      ),
+      body: const TransactionPage()
+      // floatingActionButton: ,
     );
   }
 }
