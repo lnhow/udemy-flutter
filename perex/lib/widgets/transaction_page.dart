@@ -19,6 +19,8 @@ class _TransactionPageState extends State<TransactionPage> {
     // Transaction(id: '1', title: 'Bánh mì', amount: 20, date: DateTime.now()),
   ];
 
+  bool _showChart = false;
+
   List<Transaction> get _recentTransactions {
     return _transactions.where((tx) {
       return tx.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
@@ -52,28 +54,57 @@ class _TransactionPageState extends State<TransactionPage> {
         });
   }
 
+  void _setShowChart(val) {
+    setState(() {
+      _showChart = val;
+    });
+  }
+
   @override
   Widget build(BuildContext ctx) {
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(
-            height: widget.height * 0.2,
-            child: Chart(
-              transactions: _recentTransactions,
-            ),
-          ),
-          SizedBox(
-            height: widget.height * 0.8,
-            child: TransactionListWidget(
-              transactions: _transactions,
-              onDelete: _deleteTransaction,
-            ),
-          ),
-          // TransactionInput(
-          //   onSubmit: _addTransaction,
-          // ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: MediaQuery.of(context).orientation == Orientation.landscape
+              ? [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Chart"),
+                      Switch(value: _showChart, onChanged: _setShowChart)
+                    ],
+                  ),
+                  _showChart
+                      ? SizedBox(
+                          height: widget.height * 0.8,
+                          child: Chart(
+                            transactions: _recentTransactions,
+                          ),
+                        )
+                      : SizedBox(
+                          height: widget.height * 0.8,
+                          child: TransactionListWidget(
+                            transactions: _transactions,
+                            onDelete: _deleteTransaction,
+                          ),
+                        ),
+                ]
+              : [
+                  SizedBox(
+                    height: widget.height * 0.2,
+                    child: Chart(
+                      transactions: _recentTransactions,
+                    ),
+                  ),
+                  SizedBox(
+                    height: widget.height * 0.8,
+                    child: TransactionListWidget(
+                      transactions: _transactions,
+                      onDelete: _deleteTransaction,
+                    ),
+                  ),
+                ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {

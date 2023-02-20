@@ -5,17 +5,17 @@ class EmptyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return LayoutBuilder(builder: (context, constraint) => Center(
       child: Column(
         children: [
           Text('No transaction yet',style: Theme.of(context).textTheme.headline6,),
           Container(
-            margin: const EdgeInsets.only(top: 10),
-            height: 200,
+            margin: EdgeInsets.only(top: constraint.maxHeight * 0.05),
+            height: constraint.maxHeight * 0.6,
             child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover),
           )
         ]
       ),
-    );
+    ));
   }
 }

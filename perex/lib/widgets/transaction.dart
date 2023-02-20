@@ -5,10 +5,14 @@ import 'package:perex/model/transaction.dart';
 class TransactionWidget extends StatelessWidget {
   final Transaction tx;
   final Function(String) onDelete;
-  const TransactionWidget({super.key, required this.tx, required this.onDelete});
+  const TransactionWidget(
+      {super.key, required this.tx, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
     return Card(
         child: ListTile(
       contentPadding: const EdgeInsets.all(5),
@@ -19,7 +23,7 @@ class TransactionWidget extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             border: Border.all(
-              color: Theme.of(context).primaryColor,
+              color: theme.primaryColor,
               width: 2,
             ),
             borderRadius: const BorderRadius.all(Radius.circular(10))),
@@ -29,21 +33,30 @@ class TransactionWidget extends StatelessWidget {
             '${tx.amount.toStringAsFixed(3)} đ',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor),
+                color: theme.primaryColor),
           ),
         ),
       ),
       title: Text(
         tx.title,
-        style: Theme.of(context).textTheme.headline6,
+        style: theme.textTheme.headline6,
       ),
       subtitle: Text('${DateFormat('dd/MM/yyyy').format(tx.date)}\n${tx.id}',
           style: const TextStyle(color: Colors.grey)),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete),
-        onPressed: () => onDelete(tx.id),
-        color: Theme.of(context).errorColor,
-      ),
+      trailing: mediaQuery.size.width > 360
+          ? TextButton.icon(
+              onPressed: () => onDelete(tx.id),
+              icon: const Icon(Icons.delete),
+              label: const Text('Delete'),
+              style: TextButton.styleFrom(
+                foregroundColor: theme.errorColor,
+              ),
+              )
+          : IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => onDelete(tx.id),
+              color: theme.errorColor,
+            ),
     ));
 
     // Card(

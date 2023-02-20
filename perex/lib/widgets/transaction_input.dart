@@ -37,26 +37,34 @@ class _TransactionInputState extends State<TransactionInput> {
 
   void _showDatepicker() {
     showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(DateTime.now().year),
-        lastDate: DateTime.now())
-        .then((value) {
-          if (value ==  null) {
-            return;
-          }
-          setState(() {
-            _selectedDate = value;
-          });
-        },);
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(DateTime.now().year),
+            lastDate: DateTime.now())
+        .then(
+      (value) {
+        if (value == null) {
+          return;
+        }
+        setState(() {
+          _selectedDate = value;
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return SingleChildScrollView(
+      child: Card(
         elevation: 5,
         child: Container(
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.only(
+            top: 5,
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 5,
+          ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             TextField(
               decoration: const InputDecoration(
@@ -71,8 +79,10 @@ class _TransactionInputState extends State<TransactionInput> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}'),
-                  TextButton(onPressed: _showDatepicker, child: const Text('Choose'))
+                  Text(
+                      'Date: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}'),
+                  TextButton(
+                      onPressed: _showDatepicker, child: const Text('Choose'))
                 ],
               ),
             ),
@@ -86,6 +96,6 @@ class _TransactionInputState extends State<TransactionInput> {
             ),
             ElevatedButton(onPressed: _submitInput, child: const Text('Add'))
           ]),
-        ));
+        )));
   }
 }
