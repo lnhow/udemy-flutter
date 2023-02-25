@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shopp/pages/index.dart';
+import 'package:shopp/pages/products/_id.dart';
+
+import 'package:provider/provider.dart';
+import 'package:shopp/providers/products.provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,14 +14,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'shoplee',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      routes: {
-        '/': (_) => PageIndex()
+    return ChangeNotifierProvider(
+      create: (context) {
+        return ProductsProvider();
       },
+      child: MaterialApp(
+        title: 'shoplee',
+        theme: ThemeData(
+          fontFamily: 'Lato',
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.green,
+            accentColor: Colors.greenAccent,
+          ),
+        ),
+        routes: {
+          '/': (_) => const PageIndex(),
+          PageProductDetail.route: (_) => const PageProductDetail(),
+        },
+      ),
     );
   }
 }
