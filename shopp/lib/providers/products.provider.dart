@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shopp/pages/index.dart';
+import 'package:shopp/types/filter.dart';
 import 'package:shopp/providers/product.provider.dart';
 
 class ProductsProvider with ChangeNotifier {
@@ -39,6 +41,10 @@ class ProductsProvider with ChangeNotifier {
   List<Product> get products{
     return [..._products];
   }
+
+  List<Product> get productsFavourite{
+    return _products.where((product) => product.isFavorite).toList();
+  }
   Product findById(String productId) {
     return _products.firstWhere((element) => element.id == productId);
   }
@@ -47,4 +53,5 @@ class ProductsProvider with ChangeNotifier {
     _products.add(product);
     notifyListeners();
   }
+
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shopp/pages/cart/index.dart';
 import 'package:shopp/pages/index.dart';
+import 'package:shopp/pages/orders/index.dart';
 import 'package:shopp/pages/products/_id.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shopp/providers/cart.provider.dart';
+import 'package:shopp/providers/order.provider.dart';
 import 'package:shopp/providers/products.provider.dart';
 
 void main() {
@@ -14,10 +18,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        return ProductsProvider();
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) {
+          return ProductsProvider();
+        }),
+        ChangeNotifierProvider(create: (context) {
+          return CartProvider();
+        }),
+        ChangeNotifierProvider(create: (context) {
+          return OrderProvider();
+        }),
+      ],
       child: MaterialApp(
         title: 'shoplee',
         theme: ThemeData(
@@ -30,6 +42,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (_) => const PageIndex(),
           PageProductDetail.route: (_) => const PageProductDetail(),
+          PageCart.route: (_) => const PageCart(),
+          PageOrders.route: (_) => const PageOrders(),
         },
       ),
     );
