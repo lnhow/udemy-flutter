@@ -14,6 +14,20 @@ class ProductBox extends StatelessWidget {
     Navigator.of(context).pushNamed(PageProductDetail.route, arguments: id);
   }
 
+  void handleAddToCart(context, cartProvider, product) {
+    cartProvider.addToCart(product);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text('Added item to cart!'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'UNDO',
+          onPressed: (() {
+            cartProvider.removeSingleItemFromCart(product.id);
+          }),
+        )));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -38,7 +52,7 @@ class ProductBox extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: (() {
-                  cartProvider.addToCart(product);
+                  handleAddToCart(context, cartProvider, product);
                 }),
               ),
               title: Text(
