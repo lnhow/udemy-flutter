@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:shopp/pages/index.dart';
 import 'package:shopp/pages/orders/index.dart';
+import 'package:shopp/pages/manage/index.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -10,6 +9,7 @@ class AppDrawer extends StatelessWidget {
   static const List<Map<String, Object>> drawerItems = [
     {'icon': Icons.shop, 'title': 'Home', 'to': PageIndex.route},
     {'icon': Icons.payment, 'title': 'My Order', 'to': PageOrders.route},
+    {'icon': Icons.payment, 'title': 'Manage Products', 'to': PageManageProduct.route},
   ];
 
   @override
