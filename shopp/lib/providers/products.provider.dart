@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:shopp/pages/index.dart';
 import 'package:shopp/types/filter.dart';
@@ -50,7 +52,24 @@ class ProductsProvider with ChangeNotifier {
   }
 
   void add(Product product) {
-    _products.add(product);
+    final newProduct = product.copyWith(
+      id: DateTime.now().toString()
+    );
+    _products.add(newProduct);
+    notifyListeners();
+  }
+
+  void update(String id, Product product) {
+    final productIndexToUpdate = _products.indexWhere((element) => element.id == id);
+    if (productIndexToUpdate < 0) {
+      return;
+    }
+    _products[productIndexToUpdate] = product.copyWith(id: id);
+    notifyListeners();
+  }
+
+  void delete(String id) {
+    _products.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 
