@@ -1,9 +1,8 @@
-import 'dart:developer';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shopp/pages/index.dart';
-import 'package:shopp/types/filter.dart';
+import 'package:http/http.dart' as http;
 import 'package:shopp/providers/product.provider.dart';
+import 'package:shopp/types/http.dart';
 
 class ProductsProvider with ChangeNotifier {
   final List<Product> _products = [
@@ -55,6 +54,13 @@ class ProductsProvider with ChangeNotifier {
     final newProduct = product.copyWith(
       id: DateTime.now().toString()
     );
+    http.post(toUrl('/products.json'), body: json.encode({
+      'title': product.title,
+      'description': product.description,
+      'price': product.description,
+      'image': product.image,
+      'isFavorite': product.isFavorite,
+    }));
     _products.add(newProduct);
     notifyListeners();
   }
