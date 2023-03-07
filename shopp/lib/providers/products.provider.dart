@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopp/providers/product.provider.dart';
@@ -50,19 +51,27 @@ class ProductsProvider with ChangeNotifier {
     return _products.firstWhere((element) => element.id == productId);
   }
 
-  void add(Product product) {
-    final newProduct = product.copyWith(
-      id: DateTime.now().toString()
-    );
-    http.post(toUrl('/products.json'), body: json.encode({
+  Future<void> add(Product product) {
+    return http.post(toUrl('/products.json'), body: json.encode({
       'title': product.title,
       'description': product.description,
       'price': product.description,
       'image': product.image,
       'isFavorite': product.isFavorite,
-    }));
-    _products.add(newProduct);
-    notifyListeners();
+    }))
+    .then((res) {
+      final resBody = json.decode(res.body); 
+      print(resBody);
+      final newProduct = product.copyWith(
+        id: resBody['name']
+      );
+      _products.add(newProduct);
+      notifyListeners();
+    })
+    .catchError((err) {
+      log(err);
+    });
+    
   }
 
   void update(String id, Product product) {

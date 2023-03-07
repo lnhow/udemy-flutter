@@ -136,6 +136,7 @@ class _PageEditProductsState extends State<PageEditProducts> {
   EditProductFormData _formData = EditProductFormData();
   bool _isInit = true;
   bool _isEditMode = false;
+  bool _isLoading = false;
 
   String get imageUrl {
     return _imageUrlEditController.text;
@@ -179,112 +180,126 @@ class _PageEditProductsState extends State<PageEditProducts> {
         title: const Text('Edit'),
       ),
       drawer: const AppDrawer(),
-      body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Form(
-              key: _form,
-              child: ListView(
-                children: [
-                  TextFormField(
-                    initialValue: _formData.title,
-                    decoration: const InputDecoration(labelText: 'Title'),
-                    autofocus: true,
-                    textInputAction: TextInputAction.next,
-                    validator: _formData.validateTitle,
-                    onSaved: (newValue) {
-                      _formData.title = newValue;
-                    },
-                  ),
-                  TextFormField(
-                    initialValue: _formData.price.toString(),
-                    decoration: const InputDecoration(labelText: 'Price'),
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.next,
-                    validator: _formData.validatePrice,
-                    onSaved: (newValue) {
-                      if (newValue == null) {
-                        return;
-                      }
-                      _formData.price = double.tryParse(newValue);
-                    },
-                  ),
-                  TextFormField(
-                    initialValue: _formData.description,
-                    decoration: const InputDecoration(labelText: 'Description'),
-                    maxLines: 3,
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.next,
-                    validator: _formData.validateDescription,
-                    onSaved: (newValue) {
-                      _formData.description = newValue;
-                    },
-                  ),
-                  Row(
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(8),
+              child: Form(
+                  key: _form,
+                  child: ListView(
                     children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        margin: const EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: Colors.grey)),
-                        child: imageUrl.isEmpty
-                            ? const Text('Enter an URL')
-                            : FittedBox(
-                                // fit: BoxFit.cover,
-                                child: Image.network(imageUrl),
-                              ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          decoration:
-                              const InputDecoration(labelText: 'Image URL'),
-                          keyboardType: TextInputType.url,
-                          textInputAction: TextInputAction.done,
-                          controller: _imageUrlEditController,
-                          focusNode: _imageUrlFocusNode,
-                          onFieldSubmitted: (_) => _submitForm(),
-                          onEditingComplete: (() {
-                            setState(() {
-                              // Force update state
-                            });
-                          }),
-                          validator: _formData.validateImage,
-                          onSaved: (newValue) {
-                            _formData.image = newValue;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: ElevatedButton(
-                        child: const Text('Submit'),
-                        onPressed: () {
-                          _submitForm();
+                      TextFormField(
+                        initialValue: _formData.title,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        autofocus: true,
+                        textInputAction: TextInputAction.next,
+                        validator: _formData.validateTitle,
+                        onSaved: (newValue) {
+                          _formData.title = newValue;
                         },
-                      ))
-                ],
-              ))),
+                      ),
+                      TextFormField(
+                        initialValue: _formData.price.toString(),
+                        decoration: const InputDecoration(labelText: 'Price'),
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        validator: _formData.validatePrice,
+                        onSaved: (newValue) {
+                          if (newValue == null) {
+                            return;
+                          }
+                          _formData.price = double.tryParse(newValue);
+                        },
+                      ),
+                      TextFormField(
+                        initialValue: _formData.description,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        maxLines: 3,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.next,
+                        validator: _formData.validateDescription,
+                        onSaved: (newValue) {
+                          _formData.description = newValue;
+                        },
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            margin: const EdgeInsets.only(right: 10),
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1, color: Colors.grey)),
+                            child: imageUrl.isEmpty
+                                ? const Text('Enter an URL')
+                                : FittedBox(
+                                    // fit: BoxFit.cover,
+                                    child: Image.network(imageUrl),
+                                  ),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              decoration:
+                                  const InputDecoration(labelText: 'Image URL'),
+                              keyboardType: TextInputType.url,
+                              textInputAction: TextInputAction.done,
+                              controller: _imageUrlEditController,
+                              focusNode: _imageUrlFocusNode,
+                              onFieldSubmitted: (_) => _submitForm(),
+                              onEditingComplete: (() {
+                                setState(() {
+                                  // Force update state
+                                });
+                              }),
+                              validator: _formData.validateImage,
+                              onSaved: (newValue) {
+                                _formData.image = newValue;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: ElevatedButton(
+                            child: const Text('Submit'),
+                            onPressed: () {
+                              _submitForm();
+                            },
+                          ))
+                    ],
+                  ))),
     );
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     final currentState = _form.currentState;
     final isValid = currentState?.validate();
     if (isValid == null || !isValid) {
       return;
     }
     _form.currentState?.save();
+    final scaffold = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    setState(() {
+      _isLoading = true;
+    });
+    final productProvider =
+        Provider.of<ProductsProvider>(context, listen: false);
     if (_isEditMode) {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .update(_formData.id as String, _formData.toProduct());
+      productProvider.update(_formData.id as String, _formData.toProduct());
     } else {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .add(_formData.toProduct());
+      await productProvider.add(_formData.toProduct());
     }
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved')));
+    setState(() {
+      _isLoading = false;
+    });
+    scaffold.showSnackBar(const SnackBar(content: Text('Saved')));
+    navigator.pop();
   }
 
   void _updateImageUrl() {
