@@ -10,31 +10,37 @@ class PageManageProduct extends StatelessWidget {
 
   const PageManageProduct({super.key});
 
+  Future<void> _refreshData(BuildContext context) async {
+    await Provider.of<ProductsProvider>(context, listen: false).fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductsProvider>(context);
     final products = productProvider.products;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(PageEditProducts.route);
-              },
-              icon: const Icon(Icons.add))
-        ],
-      ),
-      drawer: const AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView.builder(
-          itemBuilder: (_, i) {
-            return UserProductItem(product: products[i]);
-          },
-          itemCount: products.length,
+        appBar: AppBar(
+          title: const Text('Manage'),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(PageEditProducts.route);
+                },
+                icon: const Icon(Icons.add))
+          ],
         ),
-      ),
-    );
+        drawer: const AppDrawer(),
+        body: RefreshIndicator(
+          onRefresh: () => _refreshData(context),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: ListView.builder(
+              itemBuilder: (_, i) {
+                return UserProductItem(product: products[i]);
+              },
+              itemCount: products.length,
+            ),
+          ),
+        ));
   }
 }

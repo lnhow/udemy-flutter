@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopp/providers/product.provider.dart';
 import 'package:shopp/providers/products.provider.dart';
 import 'package:shopp/widgets/common/app_drawer.dart';
+import 'package:shopp/widgets/common/loading.dart';
 
 class PageEditProducts extends StatefulWidget {
   static const route = '/manage/product/_id';
@@ -181,9 +182,7 @@ class _PageEditProductsState extends State<PageEditProducts> {
       ),
       drawer: const AppDrawer(),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Loading()
           : Padding(
               padding: const EdgeInsets.all(8),
               child: Form(
@@ -290,15 +289,32 @@ class _PageEditProductsState extends State<PageEditProducts> {
     });
     final productProvider =
         Provider.of<ProductsProvider>(context, listen: false);
-    if (_isEditMode) {
-      productProvider.update(_formData.id as String, _formData.toProduct());
-    } else {
-      await productProvider.add(_formData.toProduct());
+
+    try {
+      if (_isEditMode) {
+        productProvider.update(_formData.id as String, _formData.toProduct());
+      } else {
+        await productProvider.add(_formData.toProduct());
+      }
+      scaffold.showSnackBar(const SnackBar(content: Text('Saved')));    
+    } catch (err) {
+      await showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+                title: const Text('Unable to save'),
+                content: const Text('Something went wrong'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        navigator.pop();
+                      },
+                      child: const Text('Close'))
+                ],
+              )));
     }
     setState(() {
       _isLoading = false;
     });
-    scaffold.showSnackBar(const SnackBar(content: Text('Saved')));
     navigator.pop();
   }
 
