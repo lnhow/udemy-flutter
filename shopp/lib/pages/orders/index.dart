@@ -17,7 +17,9 @@ class PageOrders extends StatelessWidget {
         drawer: const AppDrawer(),
         body: ListView.builder(
             itemBuilder: (context, index) {
-              return OrderItem(order: orderProvider.orders[index],);
+              return OrderItem(
+                order: orderProvider.orders[index],
+              );
             },
             itemCount: orderProvider.orders.length));
   }

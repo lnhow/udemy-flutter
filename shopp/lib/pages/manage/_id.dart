@@ -292,11 +292,12 @@ class _PageEditProductsState extends State<PageEditProducts> {
 
     try {
       if (_isEditMode) {
-        productProvider.update(_formData.id as String, _formData.toProduct());
+        await productProvider.update(
+            _formData.id as String, _formData.toProduct());
       } else {
         await productProvider.add(_formData.toProduct());
       }
-      scaffold.showSnackBar(const SnackBar(content: Text('Saved')));    
+      scaffold.showSnackBar(const SnackBar(content: Text('Saved')));
     } catch (err) {
       await showDialog(
           context: context,

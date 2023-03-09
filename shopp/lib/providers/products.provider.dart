@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shopp/providers/product.provider.dart';
+import 'package:shopp/types/exception/http_exception.dart';
+import 'package:http/http.dart' as http;
 import 'package:shopp/types/http.dart';
 
 class ProductsProvider with ChangeNotifier {
@@ -72,26 +73,51 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void update(String id, Product product) {
+  Future<void> update(String id, Product product) async {
     final productIndexToUpdate =
         _products.indexWhere((element) => element.id == id);
     if (productIndexToUpdate < 0) {
       return;
     }
-    _products[productIndexToUpdate] = product.copyWith(id: id);
-    notifyListeners();
+    final updateProduct = product.copyWith(id: id);
+    try {
+      await http.patch(toUrl('/products/$id.json'),
+          body: json.encode({
+            'title': updateProduct.title,
+            'description': updateProduct.description,
+            'price': updateProduct.price,
+            'image': updateProduct.image,
+            'isFavorite': updateProduct.isFavorite,
+          }));
+      _products[productIndexToUpdate] = updateProduct;
+      notifyListeners();
+    } catch (err) {
+      log(err.toString());
+    }
   }
 
-  void delete(String id) {
-    _products.removeWhere((element) => element.id == id);
+  Future<void> delete(String id) async {
+    final productIndex = _products.indexWhere((element) => element.id == id);
+    final productToRemove = _products[productIndex];
+    _products.removeAt(productIndex);
     notifyListeners();
+    try {
+      final res = await http.delete(toUrl('/products/$id.json'));
+      if (res.statusCode >= 400) {
+        throw HttpException(res.statusCode);
+      }
+    }
+    catch (err) {
+      _products.insert(productIndex, productToRemove);
+      notifyListeners();
+      rethrow;
+    }    
   }
 
   Future<void> fetchProducts() async {
     try {
       final res = await http.get(toUrl('/products.json'));
       final resBody = json.decode(res.body) as Map<String, dynamic>;
-      print(res.body);
       _products.clear();
       final List<Product> list =
           resBody.keys.fold<List<Product>>([], (acc, id) {

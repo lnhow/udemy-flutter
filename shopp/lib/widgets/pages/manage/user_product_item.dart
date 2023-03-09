@@ -22,12 +22,23 @@ class UserProductItem extends StatelessWidget {
             width: 100,
             child: Row(
               children: [
-                IconButton(onPressed: () {
-                  Navigator.of(context).pushNamed(PageEditProducts.route, arguments: product.id);
-                }, icon: const Icon(Icons.edit)),
                 IconButton(
-                  onPressed: () {
-                    Provider.of<ProductsProvider>(context, listen: false).delete(product.id);
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(PageEditProducts.route,
+                          arguments: product.id);
+                    },
+                    icon: const Icon(Icons.edit)),
+                IconButton(
+                  onPressed: () async {
+                    final scaffold = ScaffoldMessenger.of(context);
+                    try {
+                      await Provider.of<ProductsProvider>(context,
+                              listen: false)
+                          .delete(product.id);
+                    } catch (err) {
+                      scaffold.showSnackBar(
+                          SnackBar(content: Text('Unable to delete ($err)')));
+                    }
                   },
                   icon: const Icon(Icons.delete),
                   color: Theme.of(context).errorColor,

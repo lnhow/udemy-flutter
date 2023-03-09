@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shopp/types/exception/http_exception.dart';
+import 'package:shopp/types/http.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -16,9 +21,25 @@ class Product with ChangeNotifier {
       required this.image,
       this.isFavorite = false});
 
-  void toggleFavourite() {
-    isFavorite = !isFavorite;
+  void _setFavorite(bool val) {
+    isFavorite = val;
     notifyListeners();
+  }
+
+  Future<void> toggleFavourite() async {
+    final currentState = isFavorite;
+    _setFavorite(!isFavorite);
+    try {
+      final res = await http.patch(toUrl('/products/$id.json'),
+          body: json.encode({
+            'isFavorite': isFavorite,
+          }));
+      if (res.statusCode >= 400) {
+        throw HttpException(res.statusCode);
+      }
+    } catch (err) {
+      _setFavorite(currentState);
+    }
   }
 
   Product copyWith({
