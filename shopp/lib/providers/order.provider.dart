@@ -33,20 +33,53 @@ class OrderProvider with ChangeNotifier {
           body: json.encode({
             'total': total,
             'orderTime': now.toIso8601String(),
-            'cartItems': cartItems.map((item) => {
-              'id': item.id,
-              'title': item.title,
-              'price': double.parse(item.price.toStringAsFixed(2)),
-              'quantity': item.quantity,
-            }).toList()
+            'cartItems': cartItems
+                .map((item) => {
+                      'id': item.id,
+                      'title': item.title,
+                      'price': double.parse(item.price.toStringAsFixed(2)),
+                      'quantity': item.quantity,
+                    })
+                .toList()
           }));
       final resBody = json.decode(res.body);
       _orders.add(OrderData(
-        id: resBody['name'],
-        total: total,
-        cartItems: cartItems,
-        orderTime: now));
-    notifyListeners();
+          id: resBody['name'],
+          total: total,
+          cartItems: cartItems,
+          orderTime: now));
+      notifyListeners();
+    } catch (err) {
+      log(err.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> fetch() async {
+    try {
+      final res = await http.get(toUrl('/orders.json'));
+      var resBody = json.decode(res.body);
+      if (resBody == null) {
+        return;
+      }
+      resBody = resBody as Map<String, dynamic>;
+      _orders.clear();
+      
+      final List<OrderData> list =
+          resBody.keys.fold<List<OrderData>>([], (acc, id) {
+        final value = resBody[id];
+        acc.add(OrderData(
+            id: id,
+            total: value['total'],
+            orderTime: DateTime.parse(value['orderTime']).toLocal(),
+            cartItems: (value['cartItems'] as List<dynamic>).map((item) {
+              return CartItemData(
+                  item['id'], item['title'], item['quantity'], item['price']);
+            }).toList()));
+        return acc;
+      }).reversed.toList();
+      _orders.addAll(list);
+      notifyListeners();
     } catch (err) {
       log(err.toString());
       rethrow;
