@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:provider/provider.dart';
 import 'package:shopp/pages/cart/index.dart';
 import 'package:shopp/providers/cart.provider.dart';
