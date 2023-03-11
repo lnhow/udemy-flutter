@@ -16,7 +16,7 @@ const filters = {
 };
 
 class PageIndex extends StatefulWidget {
-  static const route = '/';
+  static const route = '/index';
 
   const PageIndex({super.key});
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:shopp/providers/auth.provider.dart';
 import 'package:shopp/providers/product.provider.dart';
 import 'package:shopp/types/exception/http_exception.dart';
 import 'package:http/http.dart' as http;
@@ -41,6 +42,14 @@ class ProductsProvider with ChangeNotifier {
     // ),
   ];
 
+  AuthProvider? authProvider;
+
+  ProductsProvider({this.authProvider});
+
+  String? get authToken {
+    return authProvider?.token;
+  }
+
   List<Product> get products {
     return [..._products];
   }
@@ -55,7 +64,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> add(Product product) async {
     try {
-      final res = await http.post(toUrl('/products.json'),
+      final res = await http.post(toUrl('/products.json', auth: authToken),
           body: json.encode({
             'title': product.title,
             'description': product.description,
@@ -81,7 +90,7 @@ class ProductsProvider with ChangeNotifier {
     }
     final updateProduct = product.copyWith(id: id);
     try {
-      await http.patch(toUrl('/products/$id.json'),
+      await http.patch(toUrl('/products/$id.json', auth: authToken),
           body: json.encode({
             'title': updateProduct.title,
             'description': updateProduct.description,
@@ -102,33 +111,41 @@ class ProductsProvider with ChangeNotifier {
     _products.removeAt(productIndex);
     notifyListeners();
     try {
-      final res = await http.delete(toUrl('/products/$id.json'));
+      final res =
+          await http.delete(toUrl('/products/$id.json', auth: authToken));
       if (res.statusCode >= 400) {
         throw HttpException(res.statusCode);
       }
-    }
-    catch (err) {
+    } catch (err) {
       _products.insert(productIndex, productToRemove);
       notifyListeners();
       rethrow;
-    }    
+    }
   }
 
   Future<void> fetchProducts() async {
     try {
-      final res = await http.get(toUrl('/products.json'));
-      final resBody = json.decode(res.body) as Map<String, dynamic>;
+      final allRes = await Future.wait([
+        http.get(toUrl('/products.json', auth: authToken)),
+        http.get(toUrl('/product-favorites/${authProvider?.uid}.json',
+            auth: authToken))
+      ]);
+
+      final resProducts = json.decode(allRes[0].body) ?? {};
+      final resFavorites = json.decode(allRes[1].body) ?? {};
+      print(resFavorites);
       _products.clear();
-      final List<Product> list =
-          resBody.keys.fold<List<Product>>([], (acc, id) {
-        final value = resBody[id];
+      final List<Product> list = resProducts.keys
+          .fold<List<Product>>(<Product>[], (List<Product> acc, id) {
+        final value = resProducts[id];
+        final isFavorite = resFavorites[id] ?? false;
         acc.add(Product(
             id: id,
             title: value['title'],
             description: value['description'],
             price: value['price'],
             image: value['image'],
-            isFavorite: value['isFavorite']));
+            isFavorite: isFavorite));
         return acc;
       });
       _products.addAll(list);

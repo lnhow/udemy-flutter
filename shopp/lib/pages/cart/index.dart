@@ -36,7 +36,7 @@ class PageCart extends StatelessWidget {
                   Chip(
                     label: Text(cartProvider.totalPrice.toStringAsFixed(2)),
                     labelStyle: TextStyle(
-                        color: theme.primaryTextTheme.headline6?.color),
+                        color: theme.primaryTextTheme.titleLarge?.color),
                     backgroundColor: theme.colorScheme.primary,
                   ),
                   OrderButton(canOrder: canOrder)

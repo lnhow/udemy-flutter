@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopp/providers/auth.provider.dart';
 import 'package:shopp/types/exception/http_exception.dart';
 import 'package:shopp/types/http.dart';
 
@@ -26,14 +27,16 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavourite() async {
+  Future<void> toggleFavourite(AuthProvider authProvider) async {
     final currentState = isFavorite;
     _setFavorite(!isFavorite);
     try {
-      final res = await http.patch(toUrl('/products/$id.json'),
-          body: json.encode({
-            'isFavorite': isFavorite,
-          }));
+      final res = await http.put(
+          toUrl('/product-favorites/${authProvider.uid}/$id.json',
+              auth: authProvider.token),
+          body: json.encode(
+            isFavorite,
+          ));
       if (res.statusCode >= 400) {
         throw HttpException(res.statusCode);
       }
