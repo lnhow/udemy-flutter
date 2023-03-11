@@ -1,8 +1,8 @@
 const baseUrl = 'shopp-9ad71-default-rtdb.asia-southeast1.firebasedatabase.app';
 const apiKey = 'AIzaSyBryTnxUaYyfnVfZaITa2Ir5cYJOFPduH8';
 
-Uri toUrl(String str, {String? auth}) {
-  final Map<String, dynamic> queryParams = {};
+Uri toUrl(String str, {String? auth, Map<String, dynamic>? query}) {
+  final Map<String, dynamic> queryParams = {...?query};
   if (auth != null) {
     queryParams['auth'] = auth;
   }

@@ -20,11 +20,15 @@ class OrderData {
 }
 
 class OrderProvider with ChangeNotifier {
-  final List<OrderData> _orders = [];
+  List<OrderData> _orders = [];
 
   final AuthProvider? authProvider;
 
-  OrderProvider({this.authProvider});
+  OrderProvider({this.authProvider, OrderProvider? orderProvider}) {
+    if (orderProvider != null) {
+      _orders = orderProvider._orders;
+    }
+  }
 
   List<OrderData> get orders {
     return [..._orders];
@@ -37,7 +41,8 @@ class OrderProvider with ChangeNotifier {
   Future<void> placeOrder(List<CartItemData> cartItems, double total) async {
     final now = DateTime.now();
     try {
-      final res = await http.post(toUrl('/orders.json', auth: authToken),
+      final res = await http.post(
+          toUrl('/orders/${authProvider?.uid}.json', auth: authToken),
           body: json.encode({
             'total': total,
             'orderTime': now.toIso8601String(),
@@ -65,7 +70,8 @@ class OrderProvider with ChangeNotifier {
 
   Future<void> fetch() async {
     try {
-      final res = await http.get(toUrl('/orders.json', auth: authToken));
+      final res = await http
+          .get(toUrl('/orders/${authProvider?.uid}.json', auth: authToken));
       var resBody = json.decode(res.body);
       if (resBody == null) {
         return;
@@ -84,6 +90,7 @@ class OrderProvider with ChangeNotifier {
                   return CartItemData(item['id'], item['title'],
                       item['quantity'], item['price']);
                 }).toList()));
+
             return acc;
           })
           .reversed

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shopp/pages/manage/_id.dart';
 import 'package:shopp/providers/products.provider.dart';
 import 'package:shopp/widgets/common/app_drawer.dart';
+import 'package:shopp/widgets/common/loading.dart';
 import 'package:shopp/widgets/pages/manage/user_product_item.dart';
 
 class PageManageProduct extends StatelessWidget {
@@ -16,8 +17,6 @@ class PageManageProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productProvider = Provider.of<ProductsProvider>(context);
-    final products = productProvider.products;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Manage'),
@@ -30,17 +29,28 @@ class PageManageProduct extends StatelessWidget {
           ],
         ),
         drawer: const AppDrawer(),
-        body: RefreshIndicator(
-          onRefresh: () => _refreshData(context),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: ListView.builder(
-              itemBuilder: (_, i) {
-                return UserProductItem(product: products[i]);
-              },
-              itemCount: products.length,
-            ),
-          ),
-        ));
+        body: FutureBuilder(
+            future: _refreshData(context),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Loading();
+              }
+              return RefreshIndicator(
+                onRefresh: () => _refreshData(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Consumer<ProductsProvider>(
+                      builder: (context, productProvider, child) {
+                    final products = productProvider.products;
+                    return ListView.builder(
+                      itemBuilder: (_, i) {
+                        return UserProductItem(product: products[i]);
+                      },
+                      itemCount: products.length,
+                    );
+                  }),
+                ),
+              );
+            }));
   }
 }

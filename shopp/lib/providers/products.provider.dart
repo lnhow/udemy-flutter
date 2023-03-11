@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shopp/types/http.dart';
 
 class ProductsProvider with ChangeNotifier {
-  final List<Product> _products = [
+  List<Product> _products = [
     // Product(
     //   id: 'p1',
     //   title: 'Red Shirt',
@@ -44,7 +44,11 @@ class ProductsProvider with ChangeNotifier {
 
   AuthProvider? authProvider;
 
-  ProductsProvider({this.authProvider});
+  ProductsProvider({this.authProvider, ProductsProvider? productProvider}) {
+    if (productProvider != null) {
+      _products = productProvider._products;
+    }
+  }
 
   String? get authToken {
     return authProvider?.token;
@@ -71,6 +75,7 @@ class ProductsProvider with ChangeNotifier {
             'price': product.price,
             'image': product.image,
             'isFavorite': product.isFavorite,
+            'createdBy': authProvider?.uid,
           }));
       final resBody = json.decode(res.body);
       final newProduct = product.copyWith(id: resBody['name']);
@@ -123,17 +128,19 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts({bool selfCreated = false}) async {
+    final query = selfCreated
+        ? {'orderBy': 'creatorId', 'equalTo': authProvider?.uid}
+        : <String, dynamic>{};
     try {
       final allRes = await Future.wait([
-        http.get(toUrl('/products.json', auth: authToken)),
+        http.get(toUrl('/products.json', auth: authToken, query: query)),
         http.get(toUrl('/product-favorites/${authProvider?.uid}.json',
             auth: authToken))
       ]);
 
       final resProducts = json.decode(allRes[0].body) ?? {};
       final resFavorites = json.decode(allRes[1].body) ?? {};
-      print(resFavorites);
       _products.clear();
       final List<Product> list = resProducts.keys
           .fold<List<Product>>(<Product>[], (List<Product> acc, id) {

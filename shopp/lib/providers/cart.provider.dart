@@ -4,8 +4,8 @@ import 'package:shopp/providers/product.provider.dart';
 class CartItemData {
   final String id;
   final String title;
-  final int quantity;
-  final double price;
+  final num quantity;
+  final num price;
 
   CartItemData(this.id, this.title, this.quantity, this.price);
 }

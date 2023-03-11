@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopp/pages/auth/index.dart';
 import 'package:shopp/pages/cart/index.dart';
 import 'package:shopp/pages/index.dart';
+import 'package:shopp/pages/loading.dart';
 import 'package:shopp/pages/manage/_id.dart';
 import 'package:shopp/pages/manage/index.dart';
 import 'package:shopp/pages/orders/index.dart';
@@ -25,6 +26,7 @@ final appRoutes = {
   PageManageProduct.route: (_) => const PageManageProduct(),
   PageEditProducts.route: (_) => const PageEditProducts(),
   PageAuth.route: (_) => const PageAuth(),
+  PageLoading.route: (_) => const PageLoading(),
 };
 
 class MyApp extends StatelessWidget {
@@ -39,7 +41,8 @@ class MyApp extends StatelessWidget {
           }),
           ChangeNotifierProxyProvider<AuthProvider, ProductsProvider>(
               update: (context, authProvider, prev) {
-            return ProductsProvider(authProvider: authProvider);
+            return ProductsProvider(
+                authProvider: authProvider, productProvider: prev);
           }, create: (context) {
             return ProductsProvider();
           }),
@@ -48,7 +51,8 @@ class MyApp extends StatelessWidget {
           }),
           ChangeNotifierProxyProvider<AuthProvider, OrderProvider>(
               update: (context, authProvider, prev) {
-            return OrderProvider(authProvider: authProvider);
+            return OrderProvider(
+                authProvider: authProvider, orderProvider: prev);
           }, create: (context) {
             return OrderProvider();
           }),
@@ -63,7 +67,17 @@ class MyApp extends StatelessWidget {
                 accentColor: Colors.greenAccent,
               ),
             ),
-            home: authProvider.isAuth ? const PageIndex() : const PageAuth(),
+            // initialRoute: '/loading',
+            home: authProvider.isAuth
+                ? const PageIndex()
+                : FutureBuilder(
+                    future: authProvider.tryLoad(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const PageLoading();
+                      }
+                      return const PageAuth();
+                    }),
             routes: appRoutes,
           ),
         ));
