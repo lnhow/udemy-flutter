@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:places/pages/places/add.dart';
 import 'package:places/pages/places/list.dart';
 import 'package:places/providers/places.provider.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           home: const PagePlacesList(),
+          routes: {
+            PagePlaceAdd.route: (_) => const PagePlaceAdd(),
+          },
         ));
   }
 }
