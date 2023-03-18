@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:places/models/place.dart';
+import 'package:places/providers/places.provider.dart';
 import 'package:places/widgets/input_image.dart';
+import 'package:places/widgets/input_location.dart';
+import 'package:provider/provider.dart';
 
 class PagePlaceAdd extends StatefulWidget {
   static const route = '/places/add';
@@ -13,6 +16,24 @@ class PagePlaceAdd extends StatefulWidget {
 }
 
 class _PagePlaceAddState extends State<PagePlaceAdd> {
+  final _formData = PlaceFormData();
+
+  void _onSelectImage(File image) {
+    print(image);
+    _formData.image = image;
+  }
+
+  void _submit() {
+    if (_formData.validateTitle(_formData.title) != null ||
+        // _formData.location == null ||
+        _formData.image == null) {
+      return;
+    }
+    Place inputPlace = _formData.toPlace();
+    Provider.of<PlacesProvider>(context, listen: false).add(inputPlace);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,17 +50,21 @@ class _PagePlaceAddState extends State<PagePlaceAdd> {
                 child: Column(children: [
                   TextFormField(
                     // initialValue: _formData.description,
-                    decoration: const InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(labelText: 'Title'),
                     textInputAction: TextInputAction.next,
                     // validator: _formData.validateDescription,
-                    onSaved: (newValue) {
-                      // _formData.description = newValue;
+                    onChanged: (newValue) {
+                      _formData.title = newValue;
                     },
                   ),
                   const SizedBox(
                     height: 16,
                   ),
-                  const InputImage()
+                  InputImage(_onSelectImage),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  InputLocation(),
                 ]),
               )),
               Padding(
@@ -48,7 +73,7 @@ class _PagePlaceAddState extends State<PagePlaceAdd> {
                     icon: const Icon(Icons.add),
                     label: const Text('Submit'),
                     onPressed: () {
-                      // _submitForm();
+                      _submit();
                     },
                   ))
             ],
@@ -74,6 +99,8 @@ class PlaceFormData {
   PlaceFormData.fromProduct(Place place) {
     id = place.id;
     _title = place.title;
+    location = place.location;
+    image = place.image;
   }
 
   set title(String? title) {
@@ -89,21 +116,11 @@ class PlaceFormData {
     return null;
   }
 
-  String? validateImage(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter an image url';
-    }
-    if (!value.startsWith(RegExp('^https?://'))) {
-      return 'Please enter a valid image url';
-    }
-    return null;
-  }
-
   Place toPlace() {
     return Place(
         id: '',
         title: title ?? '',
-        location: Location(lattitude: 0, longitude: 0, address: ''),
-        image: File(''));
+        location: location ?? Location(lattitude: 0, longitude: 0, address: ''),
+        image: image ?? File(''));
   }
 }
