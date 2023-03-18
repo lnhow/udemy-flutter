@@ -19,13 +19,16 @@ class _PagePlaceAddState extends State<PagePlaceAdd> {
   final _formData = PlaceFormData();
 
   void _onSelectImage(File image) {
-    print(image);
     _formData.image = image;
+  }
+
+  void _onSelectLocation(double lat, double lng) {
+    _formData.location = Location(latitude: lat, longitude: lng);
   }
 
   void _submit() {
     if (_formData.validateTitle(_formData.title) != null ||
-        // _formData.location == null ||
+        _formData.location == null ||
         _formData.image == null) {
       return;
     }
@@ -64,7 +67,7 @@ class _PagePlaceAddState extends State<PagePlaceAdd> {
                   const SizedBox(
                     height: 16,
                   ),
-                  InputLocation(),
+                  InputLocation(_onSelectLocation),
                 ]),
               )),
               Padding(
@@ -120,7 +123,7 @@ class PlaceFormData {
     return Place(
         id: '',
         title: title ?? '',
-        location: location ?? Location(lattitude: 0, longitude: 0, address: ''),
+        location: location ?? Location(latitude: 0, longitude: 0, address: ''),
         image: image ?? File(''));
   }
 }

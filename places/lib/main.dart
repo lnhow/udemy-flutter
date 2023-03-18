@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:places/pages/places/_id.dart';
 import 'package:places/pages/places/add.dart';
 import 'package:places/pages/places/list.dart';
 import 'package:places/pages/places/map.dart';
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
           home: const PagePlacesList(),
           routes: {
             PagePlaceAdd.route: (_) => const PagePlaceAdd(),
-            PageMap.route: (_) => const PageMap(),
+            PagePlaceDetail.route: (_) => const PagePlaceDetail(),
+            // PageMap.route: (_) => const PageMap(),
           },
         ));
   }

@@ -22,9 +22,9 @@ class DB {
           onCreate: (db, version) async {
         log(Tables.places);
         await db.execute(
-            'CREATE TABLE ${Tables.places}(id TEXT PRIMARY KEY, title TEXT, image TEXT)');
+            'CREATE TABLE ${Tables.places}(id TEXT PRIMARY KEY, title TEXT, image TEXT, lat REAL, lng REAL, address TEXT)');
         log('Created tables');
-      }, version: 1);
+      }, version: 2);
       _instance = DB._(db);
     }
     return _instance!._db;

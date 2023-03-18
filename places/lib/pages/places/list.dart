@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:places/pages/places/_id.dart';
 import 'package:places/pages/places/add.dart';
 import 'package:places/providers/places.provider.dart';
 import 'package:places/widgets/empty.dart';
@@ -44,8 +45,11 @@ class PagePlacesList extends StatelessWidget {
                             backgroundImage: FileImage(place.image),
                           ),
                           title: Text(place.title),
+                          subtitle: Text(place.location.address ?? ''),
                           onTap: () {
-                            // TODO: Go to detail page
+                            Navigator.of(context).pushNamed(
+                                PagePlaceDetail.route,
+                                arguments: place.id);
                           },
                         );
                       });
